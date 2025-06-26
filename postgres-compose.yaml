@@ -1,0 +1,27 @@
+services:
+  yaci-store-postgres:
+    image: postgres:17.4
+#    shm_size: 2g
+    environment:
+      - POSTGRES_USER=yaci
+      - POSTGRES_PASSWORD=dbpass
+      - POSTGRES_DB=yaci_store
+      - POSTGRES_LOGGING=true
+    ports:
+      - "${POSTGRES_PORT:-54320}:5432"
+    volumes:
+      - $PWD/data/pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "sh -c 'pg_isready -U yaci -d yaci_store'" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "100"
+    command: >
+      postgres
+        -c max_wal_size=256MB

@@ -1,0 +1,20 @@
+services:
+  yaci-store-postgres:
+    extends:
+      file: postgres-compose.yaml
+      service: yaci-store-postgres
+
+  yaci-address-balance-monitor-pg:
+    extends:
+      file: docker-compose.yaml
+      service: yaci-address-balance-monitor
+    depends_on:
+      yaci-store-postgres:
+        condition: service_healthy
+    environment:
+      - YACI_STORE_DB_TYPE=postgres
+      - YACI_STORE_DB_HOST=yaci-store-postgres
+      - YACI_STORE_DB_PORT=5432
+      - YACI_STORE_DB_USER=yaci
+      - YACI_STORE_DB_PASSWORD=dbpass
+      - YACI_STORE_DB_NAME=yaci_store

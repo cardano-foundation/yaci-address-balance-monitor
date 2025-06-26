@@ -1,0 +1,68 @@
+#!/bin/bash
+
+if [ -z "${ADDRESS}" ]; then
+  echo "ERROR: ADDRESS environment variable is not set."
+  exit 1
+fi
+
+# Setting defaults
+NETWORK=${NETWORK:-"preprod"}
+START_SLOT=${START_SLOT:-""}
+START_SLOT_BLOCK_HASH=${START_SLOT_BLOCK_HASH:-""}
+SYNC_INTERSECTION="${START_SLOT:-0}@${START_SLOT_BLOCK_HASH:-genesis}"
+YACI_STORE_DB_TYPE=${YACI_STORE_DB_TYPE:-"h2"}
+rm -f /app/config/application.properties
+
+case "$NETWORK" in
+  "preview")
+    export CARDANO_HOST=${CARDANO_HOST:-preview-node.world.dev.cardano.org}
+    export CARDANO_PORT=${CARDANO_PORT:-30002}
+    export CARDANO_PROTOCOL_MAGIC=${CARDANO_PROTOCOL_MAGIC:-2}
+  ;;
+
+  "preprod")
+    export CARDANO_HOST=${CARDANO_HOST:-preprod-node.world.dev.cardano.org}
+    export CARDANO_PORT=${CARDANO_PORT:-30000}
+    export CARDANO_PROTOCOL_MAGIC=${CARDANO_PROTOCOL_MAGIC:-1}
+  ;;
+
+  "mainnet")
+    export CARDANO_HOST=${CARDANO_HOST:-backbone.cardano.iog.io}
+    export CARDANO_PORT=${CARDANO_PORT:-3001}
+    export CARDANO_PROTOCOL_MAGIC=${CARDANO_PROTOCOL_MAGIC:-764824073}
+  ;;
+
+  "sanchonet")
+    export CARDANO_HOST=${CARDANO_HOST:-sanchonet-node.play.dev.cardano.org}
+    export CARDANO_PORT=${CARDANO_PORT:-3001}
+    export CARDANO_PROTOCOL_MAGIC=${CARDANO_PROTOCOL_MAGIC:-4}
+  ;;
+esac
+
+case "${YACI_STORE_DB_TYPE}" in
+  "h2")
+    export YACI_STORE_DB_URL=${YACI_STORE_DB_URL:-jdbc:h2:file:/data/yaci-store}
+  ;;
+
+  "postgres")
+    export YACI_STORE_DB_URL=${YACI_STORE_DB_URL:-jdbc:postgresql://${YACI_STORE_DB_HOST}:${YACI_STORE_DB_PORT}/${YACI_STORE_DB_NAME}}
+    cat > /app/config/application.properties <<EOF
+spring.datasource.username=${YACI_STORE_DB_USER}
+spring.datasource.password=${YACI_STORE_DB_PASSWORD}
+EOF
+  ;;
+esac
+
+envsubst >> /app/config/application.properties < /app/config/application.properties.tpl
+envsubst > /app/config/application-plugins.yml < /app/config/application-plugins.yml.tpl
+
+if [[ ! -z "${START_SLOT}" ]] && [[ ! -z "${START_SLOT_BLOCK_HASH}" ]]
+then
+  cat >> /app/config/application.properties <<EOF
+store.cardano.sync-start-slot=${START_SLOT}
+store.cardano.sync-start-blockhash=${START_SLOT_BLOCK_HASH}
+EOF
+fi
+
+echo "Starting sync on network '${NETWORK}' from slot@hash '${SYNC_INTERSECTION}' using '${CARDANO_HOST}:${CARDANO_PORT}'..."
+exec java -jar /app/yaci-store-utxo-indexer.jar

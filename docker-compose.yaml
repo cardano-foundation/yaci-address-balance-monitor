@@ -1,0 +1,20 @@
+services:
+  yaci-address-balance-monitor:
+    build:
+      context: .
+      target: production
+    image: rcmorano/address-monitor
+      #entrypoint: ["tail", "-f", "/dev/null"]
+    env_file:
+      - .env
+    ports:
+      - ${YACI_STORE_PORT:-8080}:8080
+    volumes:
+      - $PWD/data/h2-data:/data
+      - ./assets/app/config:/app/config/
+      - ./assets/plugin-scripts:/app/plugin-scripts/
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "50"
