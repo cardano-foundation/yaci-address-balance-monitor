@@ -12,6 +12,7 @@ export START_SLOT_BLOCK_HASH=${START_SLOT_BLOCK_HASH:-""}
 export SYNC_INTERSECTION="${START_SLOT:-0}@${START_SLOT_BLOCK_HASH:-genesis}"
 export YACI_STORE_DB_TYPE=${YACI_STORE_DB_TYPE:-"h2"}
 export ADDRESSES_ARRAY="[$(for addr in $ADDRESSES; do echo -n "\"$addr\","; done)]"
+export NODE_EXPORTER_PATH=${NODE_EXPORTER_PATH:-"/data/node-exporter"}
 rm -f /app/config/application.properties
 
 case "$NETWORK" in

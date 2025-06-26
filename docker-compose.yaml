@@ -11,8 +11,8 @@ services:
     volumes:
       - $PWD/data/h2-data:/data
       - $PWD/data/node-exporter:/data/node-exporter
-      - ./config:/app/config/
-      - ./plugins:/app/plugins/
+      - $PWD/config:/app/config/
+      - $PWD/plugins:/app/plugins/
     logging:
       driver: "json-file"
       options:
