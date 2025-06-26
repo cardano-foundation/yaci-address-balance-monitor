@@ -1,0 +1,10 @@
+System.out.println("Clearing tx_input table on epoch change");
+var sql = "DO $$\n" +
+          "BEGIN\n" +
+          "    DELETE FROM tx_input;\n" +
+          "EXCEPTION\n" +
+          "    WHEN others THEN\n" +
+          "        RAISE NOTICE 'Error ignored: %', SQLERRM;\n" +
+          "END;\n" +
+          "$$;";
+jdbc.update(sql);

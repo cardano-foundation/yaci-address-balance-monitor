@@ -1,16 +1,17 @@
 #!/bin/bash
 
-if [ -z "${ADDRESS}" ]; then
-  echo "ERROR: ADDRESS environment variable is not set."
+if [ -z "${ADDRESSES}" ]; then
+  echo "ERROR: ADDRESSES environment variable is not set."
   exit 1
 fi
 
 # Setting defaults
-NETWORK=${NETWORK:-"preprod"}
-START_SLOT=${START_SLOT:-""}
-START_SLOT_BLOCK_HASH=${START_SLOT_BLOCK_HASH:-""}
-SYNC_INTERSECTION="${START_SLOT:-0}@${START_SLOT_BLOCK_HASH:-genesis}"
-YACI_STORE_DB_TYPE=${YACI_STORE_DB_TYPE:-"h2"}
+export NETWORK=${NETWORK:-"preprod"}
+export START_SLOT=${START_SLOT:-""}
+export START_SLOT_BLOCK_HASH=${START_SLOT_BLOCK_HASH:-""}
+export SYNC_INTERSECTION="${START_SLOT:-0}@${START_SLOT_BLOCK_HASH:-genesis}"
+export YACI_STORE_DB_TYPE=${YACI_STORE_DB_TYPE:-"h2"}
+export ADDRESSES_ARRAY="[$(for addr in $ADDRESSES; do echo -n "\"$addr\","; done)]"
 rm -f /app/config/application.properties
 
 case "$NETWORK" in
@@ -54,7 +55,7 @@ EOF
 esac
 
 envsubst >> /app/config/application.properties < /app/config/application.properties.tpl
-envsubst > /app/config/application-plugins.yml < /app/config/application-plugins.yml.tpl
+envsubst > /app/plugins/application-plugins.yml < /app/plugins/application-plugins.yml.tpl
 
 if [[ ! -z "${START_SLOT}" ]] && [[ ! -z "${START_SLOT_BLOCK_HASH}" ]]
 then

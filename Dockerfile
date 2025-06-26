@@ -18,6 +18,7 @@ COPY --from=build /app/applications/utxo-indexer/build/libs/yaci-store-utxo-inde
 COPY --from=build /app/components/plugin-polyglot/build/libs/yaci-store-plugin-polyglot*.jar /app/plugins/yaci-store-plugin-polyglot.jar
 COPY --from=build /app/components/plugin-polyglot/build/libs/plugin-libs/*.jar /app/plugins/lib/
 COPY ./assets/bin/entrypoint /entrypoint
-COPY ./assets/app/config /app/config
+COPY ./config /app/config
+COPY ./plugins /app/plugins
 EXPOSE 8080
 ENTRYPOINT ["/entrypoint"]
