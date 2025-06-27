@@ -3,7 +3,7 @@ services:
     build:
       context: .
       target: production
-    image: cardanofoundation/yaci-address-balance-monitor:latest
+    image: ghcr.io/cardanofoundation/yaci-address-balance-monitor:latest
     env_file:
       - .env
     ports:

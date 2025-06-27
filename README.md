@@ -64,7 +64,7 @@ docker run -it \
   -v $PWD/data/node-exporer:/data/node-exporter \
   -e NETWORK=preprod \
   -e ADDRESSES=addr_test1qzpe8r5u08uvnyvl58yumkspvsp43rnjg4yutlhem2q3dehmnlkg05ptkzz3ca85qt8uy9lhz92800c4nhag8zdvkq3swaxg38 \
-  cardanofoundation/yaci-address-balance-monitor:latest
+  ghcr.io/cardano-foundation/yaci-address-balance-monitor:latest
 ```
 
 ## Gathering balances
