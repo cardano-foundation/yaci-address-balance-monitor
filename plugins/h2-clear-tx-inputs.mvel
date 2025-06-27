@@ -1,3 +1,5 @@
-System.out.println("Clearing tx_input table on epoch change");
+import java.time.Instant;
+var timestamp = Instant.now().toString();
+System.out.println(timestamp + " [INFO][YABM] Clearing tx_input table on epoch change");
 var sql = "DELETE FROM tx_input;";
 jdbc.update(sql);

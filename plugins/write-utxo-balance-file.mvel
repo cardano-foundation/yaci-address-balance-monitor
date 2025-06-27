@@ -1,6 +1,9 @@
+import java.io.PrintWriter;
+import java.io.FileWriter;
+import java.time.Instant;
+
 def writeToFile(text, filename) {
-  import java.io.PrintWriter;
-  import java.io.FileWriter;
+
 
   if (text == null) {
     println("No text to write!");
@@ -30,5 +33,8 @@ for (row : rows) {
 
 // if sb is not empty, write the file
 if (sb.length() > 0) {
+  var timestamp = Instant.now().toString();
+  System.out.println(timestamp + " [INFO][YABM] Writing the following UTXO balances to prom file:");
+  System.out.println(timestamp + " [INFO][YABM] " + rows);
   writeToFile(sb.toString(), "/data/node-exporter/utxo_balances");
 }
