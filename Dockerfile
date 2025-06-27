@@ -1,4 +1,3 @@
-ARG JDK_TAG=24.0.1_9-jre-ubi9-minimal
 ARG JDK_BUILD_IMAGE=bellsoft/liberica-openjdk-alpine
 ARG JDK_BUILD_TAG=21
 
