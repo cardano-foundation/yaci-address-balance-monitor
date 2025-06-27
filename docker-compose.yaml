@@ -4,8 +4,6 @@ services:
       context: .
       target: production
     image: rcmorano/address-monitor
-    env_file:
-      - .env
     ports:
       - ${YACI_STORE_PORT:-8080}:8080
     volumes:

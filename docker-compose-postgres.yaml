@@ -3,6 +3,11 @@ services:
     extends:
       file: postgres-compose.yaml
       service: yaci-store-postgres
+    environment:
+      - POSTGRES_USER=${YACI_STORE_DB_USER:-yaci}
+      - POSTGRES_PASSWORD=${YACI_STORE_DB_PASSWORD:-dbpass}
+      - POSTGRES_DB=${YACI_STORE_DB_NAME:-yaci_store}
+      - POSTGRES_LOGGING=${POSTGRES_LOGGING:-true}
 
   yaci-address-balance-monitor-pg:
     extends:
@@ -15,6 +20,6 @@ services:
       - YACI_STORE_DB_TYPE=postgres
       - YACI_STORE_DB_HOST=yaci-store-postgres
       - YACI_STORE_DB_PORT=5432
-      - YACI_STORE_DB_USER=yaci
-      - YACI_STORE_DB_PASSWORD=dbpass
-      - YACI_STORE_DB_NAME=yaci_store
+      - YACI_STORE_DB_USER=${YACI_STORE_DB_USER:-yaci}
+      - YACI_STORE_DB_PASSWORD=${YACI_STORE_DB_PASSWORD:-dbpass}
+      - YACI_STORE_DB_NAME=${YACI_STORE_DB_NAME:-yaci_store}
