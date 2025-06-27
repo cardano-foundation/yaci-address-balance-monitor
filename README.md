@@ -25,19 +25,21 @@ cp .env.example .env
 
 | Variable                | Description                                           | Example Value                                 |
 |-------------------------|-------------------------------------------------------|-----------------------------------------------|
-| NETWORK                 | Cardano network (preview, preprod, mainnet)           | preprod                                       |
-| START_SLOT              | (Optional) Start slot for syncing from a slot         |                                               |
-| START_SLOT_BLOCK_HASH   | (Optional) Start syncing from a specific block hash   |                                               |
 | ADDRESSES               | Whitespace-separated Cardano addresses to monitor     | addr_test1qzpe8r5u08uvnyv... addr_test1...    |
+| NETWORK                 | Cardano network (preview, preprod, mainnet)           | preprod                                       |
+| CARDANO_HOST            | Cardano relay to be used (via n2n)                    | relay.preprod.staging.wingriders.com          |
+| CARDANO_PORT            | Cardano relay port                                    | 3001                                          |
+| START_SLOT              | (Optional) Start slot for syncing from a slot         | 83462356                                      |
+| START_SLOT_BLOCK_HASH   | (Optional) Start syncing from a specific block hash   | df36d0c8728a359198eaffa18fc82a9d3970f0f5893042dddd0b56fa457c2dd6 |
 | YACI_STORE_PORT         | TCP port to expose yaci-store API                     | 8080                                          |
 | YACI_STORE_DB_TYPE      | Database type (h2 or postgres)                        | h2                                            |
 | YACI_STORE_DB_USER      | Database user (if using PostgreSQL)                   | yaci                                          |
 | YACI_STORE_DB_PASSWORD  | Database password (if using PostgreSQL)               | dbpass                                        |
 | YACI_STORE_DB_NAME      | Database name (if using PostgreSQL)                   | yaci_store                                    |
 
-## Usage
+## Running
 
-### Local H2 Database (default)
+### Using H2 file-backed storage (default)
 
 To start the monitor using the default H2 backend you just need to run:
 
@@ -45,7 +47,7 @@ To start the monitor using the default H2 backend you just need to run:
 docker-compose up -d
 ```
 
-### PostgreSQL Backend
+### Using postgres storage (default)
 
 To use a PostgreSQL backend, use the alternative Docker Compose file:
 
@@ -53,7 +55,7 @@ To use a PostgreSQL backend, use the alternative Docker Compose file:
 docker-compose -f docker-compose-postgres.yaml up -d
 ```
 
-### Running with Plain Docker
+### Using plain docker
 
 You can also run the monitor directly using Docker without Compose, for simple setups or scripting:
 
@@ -64,11 +66,35 @@ docker run -it \
   rcmorano/address-monitor
 ```
 
+## Gathering balances
+
+A [node-exporter] `textfile` collector compatible file will be written in the `./data/node-exporter` directory, and serving it via node-exporter is the original idea behing this service so you can build your own grafana dashboard and setup alerts. But you could also:
+
+* Read the `textfile` directly:
+```
+cat ./data/node-exporter/utxo-balances
+```
+* Get updates from service logs:
+```
+docker compose logs -f yaci-address-balance-monitor | grep YABM
+```
+* Access yaci-store API directly to retrieve utxos and add them yourself:
+```
+curl localhost:8080/api/v1/addresses/addr_test1wr4se9nuh57rnwu350mzy7ltztnhekpptmpdkzwupaj49nqkldg8j/utxos
+```
+* Or, if using postgres (h2 is a bit trickier), querying directly the database:
+```
+docker compose -f docker-compose-postgres.yaml \
+  exec -it \
+  yaci-store-postgres \
+  bash -c 'PGDATABASE=$POSTGRES_DB PGUSER=$POSTGRES_USER PGPASSWORD=$POSTGRES_PASS psql -c "SELECT owner_addr, SUM(lovelace_amount) AS total FROM address_utxo GROUP BY owner_addr"'
+```
+
 ## Volumes and Persistence
 
 - H2 database data: `./data/h2-data`
 - PostgreSQL database data: `./data/pg-data`
-- Node exporter data: `./data/node-exporter`. A [node-exporter] `textfile` collector compatible file will be written here.
+- Node exporter data: `./data/node-exporter`.
 - Additional config: `./config`
 - Plugins: `./plugins`
 

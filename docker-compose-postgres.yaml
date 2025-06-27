@@ -3,6 +3,8 @@ services:
     extends:
       file: postgres-compose.yaml
       service: yaci-store-postgres
+    env_file:
+      - .env
     environment:
       - POSTGRES_USER=${YACI_STORE_DB_USER:-yaci}
       - POSTGRES_PASSWORD=${YACI_STORE_DB_PASSWORD:-dbpass}
@@ -16,6 +18,8 @@ services:
     depends_on:
       yaci-store-postgres:
         condition: service_healthy
+    env_file:
+      - .env
     environment:
       - YACI_STORE_DB_TYPE=postgres
       - YACI_STORE_DB_HOST=yaci-store-postgres
