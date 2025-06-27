@@ -62,8 +62,9 @@ You can also run the monitor directly using Docker without Compose, for simple s
 ```sh
 docker run -it \
   -v $PWD/data/node-exporer:/data/node-exporter \
+  -e NETWORK=preprod \
   -e ADDRESSES=addr_test1qzpe8r5u08uvnyvl58yumkspvsp43rnjg4yutlhem2q3dehmnlkg05ptkzz3ca85qt8uy9lhz92800c4nhag8zdvkq3swaxg38 \
-  rcmorano/address-monitor
+  cardanofoundation/yaci-address-balance-monitor:latest
 ```
 
 ## Gathering balances
